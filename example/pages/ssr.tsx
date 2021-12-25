@@ -2,15 +2,16 @@ import type { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-import { serialize, deserialize } from 'superjson';
-import { SuperJSONResult } from 'superjson/dist/types';
 import Link from 'next/link';
 import { Deserialized } from '../typings';
 import { display } from '../utils/display';
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const serialized = serialize({
-    stringValue: 'static',
+export const getServerSideProps: GetServerSideProps<Record<
+  'ssr',
+  Deserialized
+>> = async () => {
+  const serialized = {
+    stringValue: 'ssr',
     dateValue: new Date('2022-01-01'),
     regexValue: /static/,
     undefinedValue: undefined,
@@ -22,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       ['three', 3],
     ]),
     errorValue: new Error('error message!'),
-  });
+  };
   return {
     props: {
       ssr: serialized,
@@ -31,11 +32,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 type HomePageProps = {
-  ssr: SuperJSONResult;
+  ssr: Deserialized;
 };
 
 const Home: NextPage<HomePageProps> = ({ ssr }) => {
-  const parsed = deserialize<Deserialized>(ssr);
   return (
     <div className={styles.container}>
       <Head>
@@ -57,14 +57,14 @@ const Home: NextPage<HomePageProps> = ({ ssr }) => {
         </h2>
         <code className={styles.code}>
           <ul>
-            <li>String: {display(parsed.stringValue)}</li>
-            <li>Date: {display(parsed.dateValue)}</li>
-            <li>RegExp: {display(parsed.regexValue)}</li>
-            <li>undefined: {display(parsed.undefinedValue)}</li>
-            <li>BigInt: {display(parsed.bigintValue)}</li>
-            <li>Set: {display(parsed.setValue)}</li>
-            <li>Map: {display(parsed.mapValue)}</li>
-            <li>Error: {display(parsed.errorValue?.toString())}</li>
+            <li>String: {display(ssr.stringValue)}</li>
+            <li>Date: {display(ssr.dateValue)}</li>
+            <li>RegExp: {display(ssr.regexValue)}</li>
+            <li>undefined: {display(ssr.undefinedValue)}</li>
+            <li>BigInt: {display(ssr.bigintValue)}</li>
+            <li>Set: {display(ssr.setValue)}</li>
+            <li>Map: {display(ssr.mapValue)}</li>
+            <li>Error: {display(ssr.errorValue?.toString())}</li>
           </ul>
         </code>
 

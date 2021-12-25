@@ -2,14 +2,16 @@ import type { NextPage, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-import { serialize, deserialize } from 'superjson';
-import { SuperJSONResult } from 'superjson/dist/types';
 import Link from 'next/link';
-import { Deserialized } from '../typings';
-import { display } from '../utils/display';
 
-export const getStaticProps: GetStaticProps = async () => {
-  const serialized = serialize({
+import { display } from '../utils/display';
+import { Deserialized } from '../typings';
+
+export const getStaticProps: GetStaticProps<Record<
+  'statics',
+  Deserialized
+>> = async () => {
+  const serialized = {
     stringValue: 'static',
     dateValue: new Date('2022-01-01'),
     regexValue: /static/,
@@ -22,7 +24,7 @@ export const getStaticProps: GetStaticProps = async () => {
       ['three', 3],
     ]),
     errorValue: new Error('error message!'),
-  });
+  };
   return {
     props: {
       statics: serialized,
@@ -31,11 +33,10 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 type HomePageProps = {
-  statics: SuperJSONResult;
+  statics: Deserialized;
 };
 
 const Home: NextPage<HomePageProps> = ({ statics }) => {
-  const parsed = deserialize<Deserialized>(statics);
   return (
     <div className={styles.container}>
       <Head>
@@ -57,14 +58,14 @@ const Home: NextPage<HomePageProps> = ({ statics }) => {
         </h2>
         <code className={styles.code}>
           <ul>
-            <li>String: {display(parsed.stringValue)}</li>
-            <li>Date: {display(parsed.dateValue)}</li>
-            <li>RegExp: {display(parsed.regexValue)}</li>
-            <li>undefined: {display(parsed.undefinedValue)}</li>
-            <li>BigInt: {display(parsed.bigintValue)}</li>
-            <li>Set: {display(parsed.setValue)}</li>
-            <li>Map: {display(parsed.mapValue)}</li>
-            <li>Error: {display(parsed.errorValue?.toString())}</li>
+            <li>String: {display(statics.stringValue)}</li>
+            <li>Date: {display(statics.dateValue)}</li>
+            <li>RegExp: {display(statics.regexValue)}</li>
+            <li>undefined: {display(statics.undefinedValue)}</li>
+            <li>BigInt: {display(statics.bigintValue)}</li>
+            <li>Set: {display(statics.setValue)}</li>
+            <li>Map: {display(statics.mapValue)}</li>
+            <li>Error: {display(statics.errorValue?.toString())}</li>
           </ul>
         </code>
 
